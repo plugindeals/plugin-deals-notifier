@@ -18,6 +18,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+          cache: 'pip'  # optional: speeds up repeated installs
 
       - name: Install dependencies
         run: |
