@@ -1,5 +1,4 @@
 name: macOS Plugin Deals Notifier
-
 on:
   push:
     branches: [ main ]
