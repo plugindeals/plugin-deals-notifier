@@ -5,7 +5,7 @@ A lightweight tool that scans for new audio plugin deals and sends desktop notif
 
 
 
--Disclaimer & License
+Disclaimer & License
 
 This program is free software licensed under the GNU General Public License v3.0.
 You may redistribute and/or modify it under the terms of the GPL-3.0.
