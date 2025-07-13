@@ -18,6 +18,15 @@ RSS_FEED_URL = "https://plugindealz.com/board/rss.php"
 class SimpleRSSReader:
     def __init__(self, root):
         self.root = root
+
+        # Show disclaimer on load
+        messagebox.showinfo("Disclaimer",
+            "This program is free software licensed under the GNU General Public License v3.0.\n"
+            "You may redistribute and/or modify it under the terms of the GPL-3.0.\n\n"
+            "This software is provided 'as is', without any warranty of any kind.\n"
+            "The author is not liable for any damages arising from its use.\n\n"
+            "Source code available at:\nhttps://github.com/plugindeals")
+
         self.root.title("Plugin Deals Notifier")
         self.root.geometry("600x500")
 
@@ -140,7 +149,6 @@ class SimpleRSSReader:
             python_exe = sys.executable.replace("\\", "\\\\")
             script_path = os.path.abspath(sys.argv[0]).replace("\\", "\\\\")
             working_dir = os.path.dirname(script_path).replace("\\", "\\\\")
-
             vbs_content = f'''
 Set oWS = WScript.CreateObject("WScript.Shell")
 sLinkFile = "{shortcut_path}"
@@ -244,45 +252,50 @@ oLink.Save
     def notify_new_content(self):
         if self.settings.get("disable_notifications", False):
             return
-        if hasattr(self, 'tray_icon'):
-            if platform.system() in ['Windows', 'Linux']:
-                self.tray_icon.notify("New deals!", "New items found in the feed.")
+
+        if platform.system() == "Windows":
+            try:
+                from win10toast import ToastNotifier
+                toaster = ToastNotifier()
+                toaster.show_toast("Plugin Deals Notifier",
+                                   "New deals available!",
+                                   duration=5,
+                                   threaded=True)
+            except ImportError:
+                pass
 
     def open_entry(self, event):
-        sel = self.listbox.curselection()
-        if sel:
-            entry = self.entries[sel[0]]
-            webbrowser.open(entry.link)
+        selection = self.listbox.curselection()
+        if selection:
+            index = selection[0]
+            url = self.entries[index].link
+            webbrowser.open(url)
 
     def hide_window(self):
         self.root.withdraw()
 
-    def show_window(self, icon=None, item=None):
-        self.root.after(0, self.root.deiconify)
-
-    def quit_app(self, icon=None, item=None):
-        icon.stop()
-        self.root.destroy()
-
     def setup_tray_icon(self):
-        icon_image = Image.new('RGB', (64, 64), color=(0, 0, 0))
-        draw = ImageDraw.Draw(icon_image)
-        draw.rectangle([0, 0, 63, 63], fill='blue')
-        draw.text((8, 20), "PD", fill="white")
+        # Create a simple icon image for tray
+        image = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+        draw.ellipse((16, 16, 48, 48), fill="blue")
+        draw.text((22, 20), "P", fill="white")
 
         menu = pystray.Menu(
-            pystray.MenuItem("Show", self.show_window),
-            pystray.MenuItem("Refresh", lambda icon, item: self.load_feed()),
-            pystray.MenuItem("Quit", self.quit_app)
+            pystray.MenuItem('Show', self.show_window),
+            pystray.MenuItem('Exit', self.exit_app)
         )
-
-        self.tray_icon = pystray.Icon("PluginDealsNotifier", icon_image, "Plugin Deals Notifier", menu)
+        self.tray_icon = pystray.Icon("plugin_deals_notifier", image, "Plugin Deals Notifier", menu)
         self.tray_icon.run()
 
-def main():
+    def show_window(self):
+        self.root.after(0, self.root.deiconify)
+
+    def exit_app(self):
+        self.tray_icon.stop()
+        self.root.quit()
+
+if __name__ == "__main__":
     root = tk.Tk()
     app = SimpleRSSReader(root)
     root.mainloop()
-
-if __name__ == "__main__":
-    main()
