@@ -4,9 +4,8 @@ A lightweight tool that scans for new audio plugin deals and sends desktop notif
 <img width="621" height="560" alt="plugin-deals-notifier" src="https://github.com/user-attachments/assets/7a516aa7-b050-47da-9bc6-0731759fa87a" />
 
 
-=======================
-   Disclaimer & License
-=======================
+
+-Disclaimer & License
 
 This program is free software licensed under the GNU General Public License v3.0.
 You may redistribute and/or modify it under the terms of the GPL-3.0.
